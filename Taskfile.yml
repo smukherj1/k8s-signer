@@ -1,0 +1,20 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GOMOD: github.com/smukherj1/k8s-signer
+
+tasks:
+  signer-frontend-container:
+    deps: [signer-frontend]
+    cmds:
+      - podman build -f containers/Containerfile.signer-frontend -t {{.GOMOD}}/signer-frontend:latest .
+  signer-frontend:
+    cmds:
+      - go build -o out/signer-frontend {{.GOMOD}}/bin/signer-frontend
+    silent: true
+    sources:
+      - "**/*.go"
+    generates:
+      - out/signer-frontend
