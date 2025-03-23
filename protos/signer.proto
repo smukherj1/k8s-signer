@@ -1,11 +1,20 @@
 syntax = "proto3";
 
-// import "google/api/annotations.proto";
+import "google/api/annotations.proto";
 option go_package = "github.com/smukherj1/k8s-signer/generated/signer/v1";
 
 service Invocations {
-    rpc CreateInvocation(CreateInvocationRequest) returns (CreateInvocationResponse);
-    rpc GetInvocation(GetInvocationRequest) returns (Invocation);
+    rpc CreateInvocation(CreateInvocationRequest) returns (CreateInvocationResponse) {
+        option (google.api.http) = {
+            post: "/v1/invocations/create"
+            body: "invocation"
+        };
+    }
+    rpc GetInvocation(GetInvocationRequest) returns (Invocation)  {
+        option (google.api.http) = {
+            get: "/v1/invocations/get/{invocation=*}"
+        };
+    }
 }
 
 message CreateInvocationRequest {
