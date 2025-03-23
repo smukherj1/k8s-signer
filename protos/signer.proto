@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+// import "google/api/annotations.proto";
+option go_package = "github.com/smukherj1/k8s-signer/generated/signer/v1";
+
+service Invocations {
+    rpc CreateInvocation(CreateInvocationRequest) returns (CreateInvocationResponse);
+    rpc GetInvocation(GetInvocationRequest) returns (Invocation);
+}
+
+message CreateInvocationRequest {
+    Invocation invocation = 1;
+}
+
+message CreateInvocationResponse {
+    Invocation invocation = 1;
+}
+
+message Invocation {
+    string name = 1;
+}
+
+message GetInvocationRequest {
+    string invocation = 1;
+}

@@ -11,10 +11,20 @@ tasks:
     cmds:
       - podman build -f containers/Containerfile.signer-frontend -t {{.GOMOD}}/signer-frontend:latest .
   signer-frontend:
+    deps: ["signer-proto"]
     cmds:
       - go build -o out/signer-frontend {{.GOMOD}}/bin/signer-frontend
-    silent: true
     sources:
       - "**/*.go"
     generates:
       - out/signer-frontend
+  signer-proto:
+    cmds:
+      - |
+        protoc --go_out=. --go_opt=paths=import --go_opt=module={{.GOMOD}} \
+          --go-grpc_out=. --go-grpc_opt=paths=import --go-grpc_opt=module={{.GOMOD}} \
+          protos/signer.proto
+    sources:
+      - protos/*.proto
+    generates:
+      - generated/**/*.go

@@ -1,16 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"context"
+	"errors"
+	"log"
+	"net"
+
+	v1pb "github.com/smukherj1/k8s-signer/generated/signer/v1"
+	"google.golang.org/grpc"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, World!")
+type invocationsServer struct {
+	v1pb.UnimplementedInvocationsServer
+}
+
+func (s *invocationsServer) CreateInvocation(ctx context.Context, in *v1pb.CreateInvocationRequest) (*v1pb.CreateInvocationResponse, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (s *invocationsServer) GetInvocation(ctx context.Context, in *v1pb.GetInvocationRequest) (*v1pb.Invocation, error) {
+	return nil, errors.New("not implemented")
 }
 
 func main() {
-	http.HandleFunc("/", handler)
-	fmt.Println("Server listening on port 8080")
-	http.ListenAndServe(":8080", nil)
+	lis, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	v1pb.RegisterInvocationsServer(s, &invocationsServer{})
+	log.Printf("Server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("Error while serving: %v", err)
+	}
 }
