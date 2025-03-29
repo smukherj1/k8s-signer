@@ -1,34 +1,77 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-option go_package = "github.com/smukherj1/k8s-signer/generated/signer/v1";
+package signer.v1;
+option go_package = "signer/v1";
 
 service Invocations {
     rpc CreateInvocation(CreateInvocationRequest) returns (CreateInvocationResponse) {
         option (google.api.http) = {
-            post: "/v1/invocations/create"
-            body: "invocation"
+            post: "/v1/invocations"
+            body: "params"
         };
     }
     rpc GetInvocation(GetInvocationRequest) returns (Invocation)  {
         option (google.api.http) = {
-            get: "/v1/invocations/get/{invocation=*}"
+            get: "/v1/invocations/{invocation}"
+        };
+    }
+
+    rpc ListInvocations(ListInvocationsRequest) returns (ListInvocationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/invocations:list"
         };
     }
 }
 
+service Artifacts {
+
+}
+
+message Digest {
+    string hash = 1;
+    int64 size = 2;
+}
+
+enum SigningWorkflow {
+    UNSPECIFIED = 0;
+    EC_P256_SHA256 = 1;
+}
+
+message InvocationParameters {
+    SigningWorkflow workflow = 1;
+    Digest input_artifact = 2;
+}
+
+message Invocation {
+    string name = 1;
+    InvocationParameters params = 2;
+    enum State {
+        UNDEFINED = 0;
+        PENDING = 1;
+        RUNNING = 2;
+        COMPLETE = 3;
+    }
+    State state = 3;
+    int32 exit_code = 4;
+    string error_details = 5;
+    Digest output_artifact = 6;
+    Digest stdout = 7;
+}
+
 message CreateInvocationRequest {
-    Invocation invocation = 1;
+    InvocationParameters params = 1;
 }
 
 message CreateInvocationResponse {
     Invocation invocation = 1;
 }
 
-message Invocation {
-    string name = 1;
-}
-
 message GetInvocationRequest {
     string invocation = 1;
+}
+
+message ListInvocationsRequest {}
+message ListInvocationsResponse {
+    repeated Invocation invocation = 1;
 }

@@ -27,6 +27,11 @@ func (s *invocationsServer) GetInvocation(ctx context.Context, in *v1pb.GetInvoc
 	return nil, errors.New("not implemented")
 }
 
+func (s *invocationsServer) ListInvocations(ctx context.Context, in *v1pb.ListInvocationsRequest) (*v1pb.ListInvocationsResponse, error) {
+	log.Printf("ListInvocations %+v", in)
+	return nil, errors.New("not implemented")
+}
+
 type invocationsClient struct {
 	s *invocationsServer
 }
@@ -39,9 +44,13 @@ func (c *invocationsClient) GetInvocation(ctx context.Context, in *v1pb.GetInvoc
 	return c.s.GetInvocation(ctx, in)
 }
 
+func (c *invocationsClient) ListInvocations(ctx context.Context, in *v1pb.ListInvocationsRequest, opts ...grpc.CallOption) (*v1pb.ListInvocationsResponse, error) {
+	return c.s.ListInvocations(ctx, in)
+}
+
 func runGRPCServer(s *invocationsServer, wg *sync.WaitGroup) {
 	defer wg.Done()
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		log.Fatalf("Failed to listen for GRPC server: %v", err)
 	}
@@ -61,7 +70,7 @@ func runHTTPGateway(s *invocationsServer, wg *sync.WaitGroup) {
 		log.Fatalf("Error registering HTTP Gateway: %v", err)
 	}
 
-	addr := ":8090"
+	addr := ":8080"
 	log.Printf("HTTP Gateway listening at %v.", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("Error serving HTTP Gateway on %v: %v", addr, err)

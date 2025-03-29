@@ -6,10 +6,15 @@ vars:
   GOMOD: github.com/smukherj1/k8s-signer
 
 tasks:
+  deploy:
+    deps: [signer-frontend-container]
+    cmds:
+      - kubectl apply -f k8s/signer-frontend.yml
   signer-frontend-container:
     deps: [signer-frontend]
     cmds:
       - podman build -f containers/Containerfile.signer-frontend -t {{.GOMOD}}/signer-frontend:latest .
+      - podman image save --format oci-archive {{.GOMOD}}/signer-frontend:latest | sudo k3s ctr images import -
   signer-frontend:
     deps: ["signer-proto"]
     cmds:
@@ -22,9 +27,9 @@ tasks:
     cmds:
       - |
         protoc --proto_path=protos \
-          --go_out=. --go_opt=paths=import --go_opt=module={{.GOMOD}} \
-          --go-grpc_out=. --go-grpc_opt=paths=import --go-grpc_opt=module={{.GOMOD}} \
-          --grpc-gateway_out=. --grpc-gateway_opt=paths=import --grpc-gateway_opt=module={{.GOMOD}} \
+          --go_out=generated --go_opt=paths=import \
+          --go-grpc_out=generated --go-grpc_opt=paths=import \
+          --grpc-gateway_out=generated --grpc-gateway_opt=paths=import \
           protos/signer.proto
     sources:
       - protos/*.proto
