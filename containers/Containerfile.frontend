@@ -1,0 +1,6 @@
+FROM alpine:3.21.3
+
+RUN apk add --no-cache libc6-compat
+COPY out/frontend /app/bin/frontend
+WORKDIR /wd
+ENTRYPOINT [ "/app/bin/frontend" ]

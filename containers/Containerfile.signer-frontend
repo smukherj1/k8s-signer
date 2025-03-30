@@ -1,6 +1,0 @@
-FROM alpine:3.21.3
-
-RUN apk add --no-cache libc6-compat
-COPY out/signer-frontend /app/bin/signer-frontend
-WORKDIR /wd
-ENTRYPOINT [ "/app/bin/signer-frontend" ]

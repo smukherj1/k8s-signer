@@ -7,22 +7,22 @@ vars:
 
 tasks:
   deploy:
-    deps: [signer-frontend-container]
+    deps: [frontend-container]
     cmds:
-      - kubectl apply -f k8s/signer-frontend.yml
-  signer-frontend-container:
-    deps: [signer-frontend]
+      - kubectl apply -f k8s/frontend.yml
+  frontend-container:
+    deps: [frontend]
     cmds:
-      - podman build -f containers/Containerfile.signer-frontend -t {{.GOMOD}}/signer-frontend:latest .
-      - podman image save --format oci-archive {{.GOMOD}}/signer-frontend:latest | sudo k3s ctr images import -
-  signer-frontend:
+      - podman build -f containers/Containerfile.frontend -t {{.GOMOD}}/frontend:latest .
+      - podman image save --format oci-archive {{.GOMOD}}/frontend:latest | sudo k3s ctr images import -
+  frontend:
     deps: ["signer-proto"]
     cmds:
-      - go build -o out/signer-frontend {{.GOMOD}}/bin/signer-frontend
+      - go build -o out/frontend {{.GOMOD}}/bin/frontend
     sources:
       - "**/*.go"
     generates:
-      - out/signer-frontend
+      - out/frontend
   signer-proto:
     cmds:
       - |
