@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	log.Init()
 	log.Info("Launching worker.")
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  []string{"redpanda-0.redpanda.redpanda.svc.cluster.local:9093", "redpanda-1.redpanda.redpanda.svc.cluster.local:9093"},

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	kafka "github.com/segmentio/kafka-go"
@@ -98,11 +99,13 @@ func runHTTPGateway(s *invocationsServer, wg *sync.WaitGroup) {
 }
 
 func main() {
+	log.Init()
 	var wg sync.WaitGroup
 	kw := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:  []string{"redpanda-0.redpanda.redpanda.svc.cluster.local:9093", "redpanda-1.redpanda.redpanda.svc.cluster.local:9093"},
-		Topic:    "test-topic",
-		Balancer: &kafka.LeastBytes{},
+		Brokers:      []string{"redpanda-0.redpanda.redpanda.svc.cluster.local:9093", "redpanda-1.redpanda.redpanda.svc.cluster.local:9093"},
+		Topic:        "test-topic",
+		Balancer:     &kafka.LeastBytes{},
+		BatchTimeout: 10 * time.Millisecond,
 	})
 	s := invocationsServer{
 		kw: kw,
