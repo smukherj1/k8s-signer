@@ -7,9 +7,15 @@ vars:
 
 tasks:
   deploy:
-    deps: [frontend-container]
+    deps: [frontend-container, worker-container]
     cmds:
       - kubectl apply -f k8s/frontend.yml
+      - kubectl apply -f k8s/worker.yml
+  rollout:
+    deps: [frontend-container, worker-container]
+    cmds:
+      - kubectl -n signer rollout restart deployment/frontend
+      - kubectl -n signer rollout restart deployment/worker
   frontend-container:
     deps: [frontend]
     cmds:
@@ -36,3 +42,15 @@ tasks:
       - protos/**/*.proto
     generates:
       - generated/**/*.go
+  worker-container:
+    deps: [worker]
+    cmds:
+      - podman build -f containers/Containerfile.worker -t {{.GOMOD}}/worker:latest .
+      - podman image save --format oci-archive {{.GOMOD}}/worker:latest | sudo k3s ctr images import -
+  worker:
+    cmds:
+      - go build -o out/worker {{.GOMOD}}/bin/worker
+    sources:
+      - "**/*.go"
+    generates:
+      - out/worker
